@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button, Paper } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const DataTable = () => {
   const [data, setData] = useState([]);
@@ -23,7 +24,6 @@ const DataTable = () => {
   }, []);
 
   const handleSave = () => {
-    
     const updatedData = [...data, newRow];
 
     axios.patch('http://localhost:8080/api/employees/batch', updatedData)
@@ -45,7 +45,6 @@ const DataTable = () => {
       })
       .catch(error => console.error('Error saving data:', error));
   };
-  
 
   const handleChange = (e, rowIndex, columnId) => {
     const newData = [...data];
@@ -58,6 +57,15 @@ const DataTable = () => {
       ...newRow,
       [columnId]: e.target.value
     });
+  };
+
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:8080/api/employees/${id}`)
+      .then(response => {
+        setData(data.filter(item => item.id !== id));
+        alert('Data deleted successfully!');
+      })
+      .catch(error => console.error('Error deleting data:', error));
   };
 
   return (
@@ -75,6 +83,7 @@ const DataTable = () => {
               <TableCell>City</TableCell>
               <TableCell>Religion</TableCell>
               <TableCell>Age</TableCell>
+              <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -124,7 +133,19 @@ const DataTable = () => {
                     variant="outlined"
                     size="small"
                     fullWidth
+                    type="number"
                   />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color='error'
+                    onClick={() => handleDelete(row.id)}
+                    size="small"
+                    startIcon={<DeleteIcon />} 
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -176,6 +197,7 @@ const DataTable = () => {
                   type="number"
                 />
               </TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableBody>
         </Table>
